@@ -1,56 +1,62 @@
-# recall-rag
 
-基于 LangChain + Streamlit 的本地 RAG 问答系统，支持向量检索、多轮对话记忆与文件级历史持久化。
+recall-rag
 
-## 功能特性
+这是一个基于 LangChain 和 Streamlit 做的本地 RAG 问答系统。可以把自定义的文档放进去，然后通过自然语言提问，系统会从文档里找到相关内容并结合大模型来回答。
 
-- 📄 本地知识库检索：通过 Chroma 向量数据库对自定义文档进行语义搜索
-- 💬 多轮对话：当前页面内的对话记忆（刷新后清空，不影响文件历史）
-- 🗂️ 历史持久化：每次对话自动保存至文件，便于回溯
-- ⚡ 流式输出：模型回答逐字显示，提升交互体验
-- 🎨 清爽界面：简洁风格的气泡聊天 UI
+功能
 
-## 核心架构与工作流程
+• 本地知识库检索：用 Chroma 向量数据库对文档做语义搜索
 
-用户输入 → Streamlit 前端 → Chain 组合层（1. 向量检索 Retriever → 2. 格式化上下文 → 3. 注入多轮历史 History → 4. Prompt 组装） → LLM 推理 → 流式输出 → 前端渲染 → 异步保存到文件 FileHistoryStore
+• 多轮对话：在当前页面内保持对话记忆，刷新页面后清空，不影响文件记录
 
-## 项目结构
+• 历史持久化：每次对话都会自动保存到文件，方便以后查看
+
+• 流式输出：模型的回答会逐字显示，不用等全部生成完才看到
+
+• 界面风格：仿豆包和元宝的气泡聊天样式
+
+架构和工作流程
+
+用户输入问题后，经过 Streamlit 前端传给 Chain 组合层。这一层会依次做这几件事：先用向量检索找到相关文档，然后把检索结果格式化成上下文，再把当前对话的历史记录注入进去，最后组装成完整的 Prompt 发给大模型。模型推理的结果以流式方式返回给前端渲染，同时异步保存到文件里。
+
+项目结构
 
 recall-rag/
-├── data_数据文档/                # 知识库原始文档（.txt）
-├── chroma_db_向量数据库/         # 向量存储（自动生成，已 gitignore）
-├── chat_histories/               # 对话历史文件（自动生成，已 gitignore）
+├── data_数据文档/                存放知识库的原始文档，目前是 txt 格式
+├── chroma_db_向量数据库/         向量存储，运行时会自动生成，已加入 gitignore
+├── chat_histories/               对话历史文件，运行时会自动生成，已加入 gitignore
 ├── 基本完成的代码/
-│   ├── rag_rag核心服务.py        # 主入口（Streamlit 应用）
-│   ├── config_data_配置文件.py   # 全局配置（检索参数、路径等）
-│   ├── vector_stores_向量存储服务.py  # 向量库封装
-│   └── file_history_store_长期会话记忆存储服务.py  # 文件持久化
+│   ├── rag_rag核心服务.py        主入口文件，Streamlit 应用
+│   ├── config_data_配置文件.py   全局配置，包括检索参数和路径设置
+│   ├── vector_stores_向量存储服务.py   向量库的封装
+│   └── file_history_store_长期会话记忆存储服务.py  文件持久化的实现
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 
-## 环境要求
+环境要求
 
-- Python 3.9+
-- 可用的 LLM API（如 OpenAI、DeepSeek 等）
+• Python 3.9 或更高版本
 
-## 快速开始
+• 需要一个可用的 LLM API，比如 OpenAI 或 DeepSeek
+
+快速开始
 
 1. 克隆仓库
-git clone https://github.com/1emon21/recall-rag.git
-cd recall-rag
+   git clone https://github.com/1emon21/recall-rag.git
+   cd recall-rag
 
 2. 安装依赖
-pip install -r requirements.txt
+   pip install -r requirements.txt
 
 3. 配置环境变量
-创建 .env 文件并填入 API Key。
+   在项目根目录创建一个 .env 文件，在里面填上你的 API Key
 
 4. 启动应用
-streamlit run 基本完成的代码/rag_rag核心服务.py
+   streamlit run 基本完成的代码/rag_rag核心服务.py
 
-浏览器访问 http://localhost:8501 即可使用。
+   然后在浏览器里打开 http://localhost:8501 就可以用了
 
-## License
+License
 
 MIT
